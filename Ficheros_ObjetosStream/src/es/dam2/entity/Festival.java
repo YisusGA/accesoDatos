@@ -2,18 +2,29 @@ package es.dam2.entity;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 public class Festival implements Serializable {
 
-	/**
-	 * 
-	 */
+	// Acordarse de que para poder serializar un objeto, hay que hacer que
+	// implemente la interfaz Serializable. Y para evitar problemas futuros si se
+	// añaden o eliminan propiedades de la clase, debe también dársele un serialID
 	private static final long serialVersionUID = 1L;
 	// Vamos a asumir que vivimos en un mundo en el que el nombre del festival es
 	// único, siendo por tanto su clave primaria
 	private String nombre;
 	private String ciudad;
 	private List<Concierto> conciertos;
+
+	public Festival(String nombre, String ciudad, List<Concierto> conciertos) {
+		this.nombre = nombre;
+		this.ciudad = ciudad;
+		this.conciertos = conciertos;
+	}
+
+	public Festival() {
+
+	}
 
 	public String getNombre() {
 		return nombre;
@@ -38,5 +49,24 @@ public class Festival implements Serializable {
 	public void setConciertos(List<Concierto> conciertos) {
 		this.conciertos = conciertos;
 	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(nombre);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Festival other = (Festival) obj;
+		return Objects.equals(nombre, other.nombre);
+	}
+	
+	
 
 }

@@ -2,7 +2,6 @@ package es.dam2.dao;
 
 import java.util.List;
 
-import es.dam2.entity.Concierto;
 import es.dam2.entity.Festival;
 
 public interface FestivalDAO {
@@ -12,12 +11,12 @@ public interface FestivalDAO {
 
 	void insert(Festival festival);
 
-	Concierto findById(String nombre);
+	Festival findById(String nombre);
 
 	void delete(String nombre);
 
 	void update(Festival festival);
 
-	List<Concierto> findAll();
+	List<Festival> findAll();
 
 }
