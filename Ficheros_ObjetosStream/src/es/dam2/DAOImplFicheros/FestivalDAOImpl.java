@@ -13,9 +13,10 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-
+import java.util.Optional;
 import es.dam2.accesoFicheros.ObjectOutputStreamNoHeader;
 import es.dam2.dao.FestivalDAO;
+import es.dam2.entity.Concierto;
 import es.dam2.entity.Festival;
 
 public class FestivalDAOImpl implements FestivalDAO {
@@ -69,11 +70,11 @@ public class FestivalDAOImpl implements FestivalDAO {
 	 * Finds a Festival, given its name
 	 * 
 	 * @param nombre the name of the festival
-	 * @return the Festival found with that name
-	 * @throws NoSuchElementException if no Festival was found
+	 * @return an Optional that may contain a Festival found with the name provided,
+	 *         or null if no Festival was found
 	 */
 	@Override
-	public Festival findById(String nombre) throws NoSuchElementException {
+	public Optional<Festival> findById(String nombre) throws NoSuchElementException {
 
 		boolean fin = false;
 		Festival f = null;
@@ -82,16 +83,14 @@ public class FestivalDAOImpl implements FestivalDAO {
 
 			while (!fin) {
 				try {
-					f = (Festival) ois.readObject();
-					if (f.getNombre().equalsIgnoreCase(nombre)) {
+					Festival aux = (Festival) ois.readObject();
+					if (aux.getNombre().equalsIgnoreCase(nombre)) {
 						fin = true;
+						f = aux;
 					}
 				} catch (EOFException e) {
 					fin = true;
 				}
-			}
-			if (f == null) {
-				throw new NoSuchElementException("No se encontró un festival con ese nombre");
 			}
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -103,7 +102,7 @@ public class FestivalDAOImpl implements FestivalDAO {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return f;
+		return Optional.ofNullable(f); // Se convierte el Festival, que podría ser null, a un Optional nullable
 	}
 
 	@Override
@@ -220,6 +219,10 @@ public class FestivalDAOImpl implements FestivalDAO {
 			e.printStackTrace();
 		}
 		return festivales;
+	}
+
+	public void addConcierto(Concierto concierto, String nombreFestival) {
+		findById(nombreFestival).orElseThrow().getConciertos().add(concierto);
 	}
 
 	/**

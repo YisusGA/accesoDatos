@@ -1,35 +1,34 @@
 package es.dam2.app;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-
+import java.util.Properties;
 import es.dam2.DAOImplFicheros.FestivalDAOImpl;
-import es.dam2.entity.Concierto;
-import es.dam2.entity.Festival;
+import es.dam2.service.FestivalService;
 
 public class MainConciertos {
 
 	public static void main(String[] args) {
 		
-		List<Concierto> conciertos = new ArrayList<>();
-		conciertos.add(new Concierto());
+		// Clase que está hecha para leer ficheros .properties
+		// El nombre del fichero de festivales lo metemos en el fichero.properties. L
+		Properties properties = new Properties();
+		try {
+			properties.load(new FileReader("src\\fichero.properties"));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-		FestivalDAOImpl dao = new FestivalDAOImpl(Path.of("festivales.dat"));
-
-		dao.insert(new Festival("Rock in Rio", "Madrid", conciertos));
-		dao.insert(new Festival("Mad Cool", "Madrid", conciertos));
-		dao.insert(new Festival("Arenal Sound", "Valencia", conciertos));
+		FestivalService festServ = new FestivalService(new FestivalDAOImpl(Path.of(properties.getProperty("nombre") + ".dat")));
+		festServ.crearFestivalSinConciertos();
 		
-		
-		dao.findAll().stream().forEach(x -> System.out.println("Nombre: " + x.getNombre() + ", Ciudad: "+ x.getCiudad()));
-		
-		
-//		dao.delete("Rock in Rio");
-		dao.update(new Festival("Rock in Rio", "Wherever", conciertos));
-		
-		System.out.println();
-		dao.findAll().stream().forEach(x -> System.out.println("Nombre: " + x.getNombre() + " Ciudad: "+ x.getCiudad()));
+		System.out.println(festServ.recuperaConciertosFestival("Mad Cool"));
 	}
 
 }
