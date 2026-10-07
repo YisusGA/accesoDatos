@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Properties;
 import es.dam2.DAOImplFicheros.FestivalDAOImpl;
+import es.dam2.entity.Concierto;
 import es.dam2.service.FestivalService;
 
 public class MainConciertos {
@@ -26,8 +27,11 @@ public class MainConciertos {
 		}
 		
 		FestivalService festServ = new FestivalService(new FestivalDAOImpl(Path.of(properties.getProperty("nombre") + ".dat")));
-		festServ.crearFestivalSinConciertos();
-		
+//		festServ.crearFestivalSinConciertos();
+		System.out.println("Conciertos recuperados antes de añadir conciertos:");
+		System.out.println(festServ.recuperaConciertosFestival("Mad Cool"));
+		festServ.addConcierto(new Concierto(5, "My Chemical Romance", 120, 35.6), "Mad Cool");
+		System.out.println("Conciertos recuperados desoués de añadir conciertos:");
 		System.out.println(festServ.recuperaConciertosFestival("Mad Cool"));
 	}
 

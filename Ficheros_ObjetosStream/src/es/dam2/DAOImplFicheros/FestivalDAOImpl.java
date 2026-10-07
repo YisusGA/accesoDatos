@@ -14,9 +14,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import es.dam2.accesoFicheros.ObjectOutputStreamNoHeader;
 import es.dam2.dao.FestivalDAO;
-import es.dam2.entity.Concierto;
 import es.dam2.entity.Festival;
 
 public class FestivalDAOImpl implements FestivalDAO {
@@ -30,6 +33,8 @@ public class FestivalDAOImpl implements FestivalDAO {
 	// métodos de la interface, se inyecten las implementaciones de una u otra clase
 
 	private Path ficheroFestivales; // Esto se inyectará por constructor cuando se cree una instancia de la clase
+	// Obtención del logger utilizando la API nativa de Log4j 2
+    private static final Logger logger = LogManager.getLogger(FestivalDAOImpl.class);
 
 	public FestivalDAOImpl(Path ficheroFestivales) {
 		this.ficheroFestivales = ficheroFestivales;
@@ -58,6 +63,7 @@ public class FestivalDAOImpl implements FestivalDAO {
 		} catch (FileNotFoundException e) {
 			// Aquí normalmente se sacaría una entrada a un log, y se comentaría el
 			// e.printStackTrace() en el despliegue
+			logger.error("No se encontró el fichero");
 			e.printStackTrace();
 		} catch (IOException e) {
 			// Aquí normalmente se sacaría una entrada a un log
@@ -66,44 +72,6 @@ public class FestivalDAOImpl implements FestivalDAO {
 
 	}
 
-	/**
-	 * Finds a Festival, given its name
-	 * 
-	 * @param nombre the name of the festival
-	 * @return an Optional that may contain a Festival found with the name provided,
-	 *         or null if no Festival was found
-	 */
-	@Override
-	public Optional<Festival> findById(String nombre) throws NoSuchElementException {
-
-		boolean fin = false;
-		Festival f = null;
-
-		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(ficheroFestivales.toFile()))) {
-
-			while (!fin) {
-				try {
-					Festival aux = (Festival) ois.readObject();
-					if (aux.getNombre().equalsIgnoreCase(nombre)) {
-						fin = true;
-						f = aux;
-					}
-				} catch (EOFException e) {
-					fin = true;
-				}
-			}
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return Optional.ofNullable(f); // Se convierte el Festival, que podría ser null, a un Optional nullable
-	}
 
 	@Override
 	public void delete(String nombre) {
@@ -192,6 +160,45 @@ public class FestivalDAOImpl implements FestivalDAO {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * Finds a Festival, given its name
+	 * 
+	 * @param nombre the name of the festival
+	 * @return an Optional that may contain a Festival found with the name provided,
+	 *         or null if no Festival was found
+	 */
+	@Override
+	public Optional<Festival> findById(String nombre) throws NoSuchElementException {
+
+		boolean fin = false;
+		Festival f = null;
+
+		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(ficheroFestivales.toFile()))) {
+
+			while (!fin) {
+				try {
+					Festival aux = (Festival) ois.readObject();
+					if (aux.getNombre().equalsIgnoreCase(nombre)) {
+						fin = true;
+						f = aux;
+					}
+				} catch (EOFException e) {
+					fin = true;
+				}
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return Optional.ofNullable(f); // Se convierte el Festival, que podría ser null, a un Optional nullable
+	}
 
 	@Override
 	public List<Festival> findAll() {
@@ -219,10 +226,6 @@ public class FestivalDAOImpl implements FestivalDAO {
 			e.printStackTrace();
 		}
 		return festivales;
-	}
-
-	public void addConcierto(Concierto concierto, String nombreFestival) {
-		findById(nombreFestival).orElseThrow().getConciertos().add(concierto);
 	}
 
 	/**

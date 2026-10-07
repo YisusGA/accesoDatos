@@ -50,11 +50,22 @@ public class Festival implements Serializable {
 		this.conciertos = conciertos;
 	}
 
+	// En Eclipse, click derecho>Source>Generate hashCode() and equals() y elegir la
+	// propiedad de la clase que queremos usar como criterio de igualdad entre
+	// objetos de la clase
+
+	// Esto sirve para establecer el criterio de igualdad entre objetos de la clase
+	// si usamos objetos de la clase como claves de un HashMap
 	@Override
 	public int hashCode() {
 		return Objects.hash(nombre);
 	}
 
+	// Con esto, lo que hacemos es proporcionar a Java un criterio de comparación
+	// entre objetos de Festival, que en este caso sería el nombre. Si 2 festivales
+	// tienen el mismo nombre, entonces son iguales. Si pongo
+	// festival1.equals(festival2) y ambos tienen el mismo nombre, devolverá un
+	// true, o false si los nombres son distintos
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -66,7 +77,5 @@ public class Festival implements Serializable {
 		Festival other = (Festival) obj;
 		return Objects.equals(nombre, other.nombre);
 	}
-	
-	
 
 }

@@ -20,7 +20,5 @@ public interface FestivalDAO {
 	void update(Festival festival);
 
 	List<Festival> findAll();
-	
-	public void addConcierto(Concierto concierto, String nombreFestival);
 
 }
