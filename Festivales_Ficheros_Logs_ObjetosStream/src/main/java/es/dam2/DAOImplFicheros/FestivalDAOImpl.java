@@ -33,7 +33,7 @@ public class FestivalDAOImpl implements FestivalDAO {
 	// métodos de la interface, se inyecten las implementaciones de una u otra clase
 
 	private Path ficheroFestivales; // Esto se inyectará por constructor cuando se cree una instancia de la clase
-	// Obtención del logger utilizando la API nativa de Log4j 2
+	// Instanciación del logger utilizando la API nativa de Log4j 2
     private static final Logger logger = LogManager.getLogger(FestivalDAOImpl.class);
 
 	public FestivalDAOImpl(Path ficheroFestivales) {
@@ -61,13 +61,9 @@ public class FestivalDAOImpl implements FestivalDAO {
 				oos.writeObject(festival);
 			}
 		} catch (FileNotFoundException e) {
-			// Aquí normalmente se sacaría una entrada a un log, y se comentaría el
-			// e.printStackTrace() en el despliegue
-			logger.error("No se encontró el fichero");
-			e.printStackTrace();
+			logger.error("No se encontró el fichero", e.getMessage(), e);
 		} catch (IOException e) {
-			// Aquí normalmente se sacaría una entrada a un log
-			e.printStackTrace();
+			logger.error("Error de escritura en el fichero", e.getMessage(), e);
 		}
 
 	}
@@ -95,14 +91,11 @@ public class FestivalDAOImpl implements FestivalDAO {
 			}
 
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("No se encontró el fichero", e.getMessage(), e);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Error de lectura o escritura en el fichero", e.getMessage(), e);
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("No se encontró la clase del objeto que se ha intentado leer el fichero", e.getMessage(), e);
 		}
 
 		// Es importante que esto vaya fuera del try-catch anterior, pues si no, el ois
@@ -114,8 +107,7 @@ public class FestivalDAOImpl implements FestivalDAO {
 			// archivo destino y el tipo de movimiento que se quiere hacer
 			Files.move(aux, ficheroFestivales, StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Error en la operación de renombrado del fichero", e.getMessage(), e);
 		}
 	}
 
@@ -143,21 +135,17 @@ public class FestivalDAOImpl implements FestivalDAO {
 			}
 
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("No se encontró el fichero", e.getMessage(), e);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Error de lectura o escritura en el fichero", e.getMessage(), e);
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("No se encontró la clase del objeto que se ha intentado leer el fichero", e.getMessage(), e);
 		}
 
 		try {
 			Files.move(aux, ficheroFestivales, StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Error en la operación de renombrado del fichero", e.getMessage(), e);
 		}
 	}
 	
@@ -188,14 +176,11 @@ public class FestivalDAOImpl implements FestivalDAO {
 				}
 			}
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("No se encontró el fichero", e.getMessage(), e);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Error de lectura o escritura en el fichero", e.getMessage(), e);
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("No se encontró la clase del objeto que se ha intentado leer el fichero", e.getMessage(), e);
 		}
 		return Optional.ofNullable(f); // Se convierte el Festival, que podría ser null, a un Optional nullable
 	}
@@ -216,14 +201,11 @@ public class FestivalDAOImpl implements FestivalDAO {
 				}
 			}
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("No se encontró el fichero", e.getMessage(), e);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Error de lectura o escritura en el fichero", e.getMessage(), e);
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("No se encontró la clase del objeto que se ha intentado leer el fichero", e.getMessage(), e);
 		}
 		return festivales;
 	}
@@ -248,16 +230,13 @@ public class FestivalDAOImpl implements FestivalDAO {
 					} catch (EOFException e) {
 						fin = true;
 					} catch (ClassNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						logger.error("No se encontró la clase del objeto que se ha intentado leer el fichero", e.getMessage(), e);
 					}
 				}
-			} catch (FileNotFoundException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			} catch (FileNotFoundException e) {
+				logger.error("No se encontró el fichero", e.getMessage(), e);
+			} catch (IOException e) {
+				logger.error("Error de lectura o escritura en el fichero", e.getMessage(), e);
 			}
 		}
 		return existe;

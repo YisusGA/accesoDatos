@@ -6,7 +6,11 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.Set;
+
 import java.util.stream.Collectors;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import es.dam2.dao.FestivalDAO;
 import es.dam2.entity.Concierto;
@@ -14,6 +18,8 @@ import es.dam2.entity.Festival;
 import teclado.TecladoOK;
 
 public class FestivalService {
+
+	private static final Logger logger = LogManager.getLogger(FestivalService.class);
 
 	private FestivalDAO dao;
 
@@ -38,13 +44,22 @@ public class FestivalService {
 	}
 
 	public List<Concierto> recuperaListaConciertosFestival(String nombre) {
-		return dao.findById(nombre).orElseThrow().getConciertos().stream().toList();
+		// orElseThrow() necesita un Supplier como parámetro en esta verión. Podemos
+		// aprovechar para que en el cuerpo del Supplier, el logger escriba una traza
+		// del error, y después de eso, es obligatorio que se lance una Excepción, pues
+		// el Supplier debe generar un retorno
+		return dao.findById(nombre).orElseThrow(() -> {
+			logger.error("No se encontró el festival con el nombre " + nombre);
+			return new NoSuchElementException("Festival no encontrado: " + nombre);
+		}).getConciertos().stream().toList();
 	}
 
 	// Devuelve en diferentes líneas artista -> cache
 	public String recuperaConciertosFestival(String nombre) {
-		return dao.findById(nombre).orElseThrow().getConciertos().stream()
-				.map(x -> x.getArtista() + "->" + x.getCache()).collect(Collectors.joining("\n"));
+		return dao.findById(nombre).orElseThrow(() -> {
+			logger.error("No se encontró el festival con el nombre " + nombre);
+			return new NoSuchElementException("Festival no encontrado: " + nombre);
+		}).getConciertos().stream().map(x -> x.getArtista() + "->" + x.getCache()).collect(Collectors.joining("\n"));
 	}
 
 	public void addConcierto(Concierto concierto, String nombreFestival) throws NoSuchElementException {
@@ -52,7 +67,12 @@ public class FestivalService {
 		// métodos aque ya hay en el DAO. Porque si usamos los métodos que ya hay en el
 		// DAO, estamos accediendo 2 veces al fichero, con el findById(String nombre) y
 		// con el update (Festival festival)
-		Festival f = dao.findById(nombreFestival).orElseThrow();
+		Festival f = dao.findById(nombreFestival).orElseThrow(() -> {
+			logger.error("No se encontró el festival con el nombre " + nombreFestival);
+			return new NoSuchElementException("Festival no encontrado: " + nombreFestival);
+		});
+		// Es mejor separar esto en 2 partes y no meter todo en una única expresión
+		// funcional, porque es más legible y separa mejor responsabilidades
 		if (!f.getConciertos().contains(concierto)) {
 			f.getConciertos().add(concierto);
 			dao.update(f);
