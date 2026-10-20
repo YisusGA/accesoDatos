@@ -38,7 +38,7 @@ public class MainConciertos {
 		}
 
 		FestivalService festServ = new FestivalService(
-				new FestivalDAOImpl(Path.of(properties.getProperty("nombre") + ".dat")));
+				new FestivalDAOImpl(Path.of(properties.getProperty("nombre"))));
 		festServ.crearFestivalSinConciertos();
 		System.out.println("Conciertos recuperados antes de añadir conciertos:");
 		System.out.println(festServ.recuperaConciertosFestival("Mad Cool"));
