@@ -38,7 +38,7 @@ public class Gestion {
 		try {
 			properties.load(is);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("No se pudo cargar el fichero de propiedades de la aplicación", e.getMessage(), e);
 		}
 		file = new File(properties.getProperty("ficheroXML"));
 		doc = getDocument(file);
@@ -47,18 +47,26 @@ public class Gestion {
 	private Document getDocument(File file) {
 
 		Document doc = null;
+		// DocumentBuilderFactory es una clase abstracta, así que no puede instanciarse
+		// con constructor, necesitamos usar el método estático
+		// DocumentBuilderFactory.newInstance() para generar una instancia
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		try {
+			// DocumentBuilder es una clase abstracta, así que no puede instanciarse
+			// con constructor, necesitamos usar el método newDocumentBuilder() de la
+			// instancia de DocumentBuilderFactory para generar una instancia
 			DocumentBuilder db = dbf.newDocumentBuilder();
+			// Creada la instancia de DocumentBuilder, ya podemos usar su método parse(File
+			// file) para parsear un fichero XML y contruir un DOM a partir de él,
+			// almacenándolo en nuestro instancia de Document
 			doc = db.parse(file);
-			// Cuando metemmeos un salto de línea en un XML para conseguir una estructura
+			// Cuando metemeos un salto de línea en un XML para conseguir una estructura
 			// más legible para el ser humano, metemos un carácter \n. Y esto es reconocido
 			// como un nodo texto en el DOM. El método normalize() de Document sirve para
 			// limpiar estos nodos "vacíos" a la hora de construir el DOM
 			doc.normalize();
 		} catch (ParserConfigurationException | SAXException | IOException e) {
-			logger.error("No se pudo leer del XML");
-			e.printStackTrace();
+			logger.error("No se pudo parsear el XML", e.getMessage(), e);
 		}
 		return doc;
 	}
@@ -75,12 +83,10 @@ public class Gestion {
 			StreamResult result = new StreamResult(file);
 			tr.transform(source, result);
 		} catch (TransformerException e) {
-			logger.error("No se pudo actualizar el XML");
-			e.printStackTrace();
+			logger.error("No se pudo actualizar el XML", e.getMessage(), e);
 		}
 	}
 
-	// COMPLETAR
 	public void mostrarResponsables() {
 
 		// Este método saca sólo los nodos que son elementos (etiquetas)
@@ -104,8 +110,8 @@ public class Gestion {
 			// Recorrerlas y mostrar sus responsables
 			for (int j = 0; j < investigaciones.getLength(); j++) {
 				Element investigacion = (Element) investigaciones.item(j);
-				System.out.println("Responsables de investigacion del año " + investigacion.getAttribute("año") + ": "
-						+ investigacion.getElementsByTagName("responsable").item(0).getTextContent());
+				System.out.printf("Responsables de investigacion del año %s: %s\n", investigacion.getAttribute("año"),
+						investigacion.getElementsByTagName("responsable").item(0).getTextContent());
 			}
 			System.out.println();
 		}
@@ -121,8 +127,8 @@ public class Gestion {
 
 			NodeList investigaciones = expediente.getElementsByTagName("investigacion");
 
-			System.out.println("El expediente con código " + expediente.getAttribute("codigo") + " tiene "
-					+ investigaciones.getLength() + " investigaciones");
+			System.out.printf("El expediente con código %s tiene %s investigaciones\n",
+					expediente.getAttribute("codigo"), investigaciones.getLength());
 		}
 	}
 
@@ -163,12 +169,17 @@ public class Gestion {
 		// la posición 2 pasa a la posición 1, pero el contador i pasa a ser 2. Y
 		// entonces el bucle de iteración se saltará el elemento que inicialmente estaba
 		// en la posición 2 (y ahora en la 1). Si iteramos desde el final, evitamos
-		// saltarnos elementos por este motivo
+		// saltarnos elementos por este motivo. Para ver una explicación más detallada,
+		// mirar apuntes del 21/10/2026
 		for (int i = investigaciones.getLength() - 1; i >= 0; i--) {
 			Element investigacion = (Element) investigaciones.item(i);
-			if (Integer.parseInt(investigacion.getAttribute("año")) < anio) {
-				investigacion.getParentNode().removeChild(investigacion);
-				numInvestigacionesEliminadas++;
+			try {
+				if (Integer.parseInt(investigacion.getAttribute("año")) < anio) {
+					investigacion.getParentNode().removeChild(investigacion);
+					numInvestigacionesEliminadas++;
+				}
+			} catch (NumberFormatException e) {
+				logger.error("No se pudo parsear el año de la investigación. Investigación ignorada");
 			}
 		}
 		updateFile();
