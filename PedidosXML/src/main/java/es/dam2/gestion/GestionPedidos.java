@@ -8,7 +8,6 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.Scanner;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -24,6 +23,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import es.dam2.entidad.Cliente;
@@ -62,7 +62,7 @@ public class GestionPedidos {
 		}
 
 		document = getDocument(ficheroPedidos);
-		
+
 		try {
 			if (Files.size(ficheroPedidos.toPath()) == 0) {
 				updateFile();
@@ -77,6 +77,12 @@ public class GestionPedidos {
 
 	}
 
+	/**
+	 * Método para construir Document a partir de un File con extensión .xml
+	 * 
+	 * @param file el archivo asociado al fichero XML
+	 * @return Document o null si no se pudo construir el DOM
+	 */
 	public Document getDocument(File file) {
 		Document doc = null;
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -98,6 +104,11 @@ public class GestionPedidos {
 		return doc;
 	}
 
+	/**
+	 * Método para generar una lista de productos
+	 * 
+	 * @return la lista de productos con sus elementos
+	 */
 	public List<Producto> crearListaProductos() {
 		List<Producto> productos = new ArrayList<>();
 		System.out.println("¿Cuántos productos quieres añadir?");
@@ -118,6 +129,12 @@ public class GestionPedidos {
 		return productos;
 	}
 
+	/**
+	 * Método para construir un Pedido con todos sus datos
+	 * 
+	 * @param listaProductos la lista de productos para añadir al Pedido
+	 * @return el Pedido que se ha creado
+	 */
 	public Pedido crearPedido(List<Producto> listaProductos) {
 		Pedido pedido = null;
 
@@ -134,6 +151,11 @@ public class GestionPedidos {
 		return pedido;
 	}
 
+	/**
+	 * Método para insertar un nuevo Pedido en el fichero XML de pedidos
+	 * 
+	 * @param pedido el Pedido a insertar
+	 */
 	public void insertarPedido(Pedido pedido) {
 
 		// Obtenemos el nodo pedidos
@@ -170,6 +192,91 @@ public class GestionPedidos {
 		updateFile();
 	}
 
+	/**
+	 * Método para eliminar todos los pedidos asociados a un Cliente
+	 * 
+	 * @param nifCliente el nif del Cliente cuyos pedidos quieren eliminarse
+	 * @return el número de pedidos eliminados
+	 */
+	public int eliminarPedidosCliente(String nifCliente) {
+
+		int numPedidosEliminados = 0;
+		NodeList pedidosNodeList = document.getElementsByTagName("pedido");
+
+		for (int i = pedidosNodeList.getLength() - 1; i >= 0; i--) {
+			Element pedido = (Element) pedidosNodeList.item(i);
+			Element cliente = (Element) pedido.getElementsByTagName("cliente").item(0);
+			String nif = cliente.getElementsByTagName("nif").item(0).getTextContent();
+			if (nif.equals(nifCliente)) {
+				pedido.getParentNode().removeChild(pedido);
+				numPedidosEliminados++;
+			}
+		}
+
+		if (numPedidosEliminados > 0) {
+			updateFile();
+		}
+		return numPedidosEliminados;
+	}
+
+	/**
+	 * Método para mostrar por consola los pedidos asociados a un Cliente
+	 * 
+	 * @param nifCliente el nif del Cliente cuyos pedidos se quiere mostrar
+	 */
+	public void mostrarPedidosCliente(String nifCliente) {
+
+		NodeList pedidosNodeList = document.getElementsByTagName("pedido");
+
+		System.out.printf("Códigos de pedidos del cliente con nif %s: ", nifCliente);
+		for (int i = pedidosNodeList.getLength() - 1; i >= 0; i--) {
+			Element pedido = (Element) pedidosNodeList.item(i);
+			Element cliente = (Element) pedido.getElementsByTagName("cliente").item(0);
+			String nif = cliente.getElementsByTagName("nif").item(0).getTextContent();
+			if (nif.equals(nifCliente)) {
+				System.out.print(pedido.getAttribute("codigo") + ", ");
+			}
+			System.out.println();
+		}
+	}
+
+	/**
+	 * Método para mostrar los gastos totales de un Cliente
+	 * 
+	 * @param nifCliente el nif del Cliente cuyo gasto total se quiere calcular
+	 * @return un double con el gasto total asociado al cliente encontrado, o -1 si
+	 *         no se encontró un Cliente con ese nif
+	 */
+	public double devolverGastosCiente(String nifCliente) {
+		double gastoTotal = 0;
+		boolean existeCliente = false;
+
+		NodeList pedidosNodeList = document.getElementsByTagName("pedido");
+
+		for (int i = pedidosNodeList.getLength() - 1; i >= 0; i--) {
+			Element pedido = (Element) pedidosNodeList.item(i);
+			Element cliente = (Element) pedido.getElementsByTagName("cliente").item(0);
+			String nif = cliente.getElementsByTagName("nif").item(0).getTextContent();
+			if (nif.equals(nifCliente)) {
+				existeCliente = true;
+				NodeList listaProductos = pedido.getElementsByTagName("productos").item(0).getChildNodes();
+				for (int j = 0; j < listaProductos.getLength(); j++) {
+					//gastoTotal += Double.parseDouble(listaProductos.item(j).getChildNodes().item(2).getTextContent());
+					gastoTotal += Double.parseDouble(((Element)listaProductos.item(j)).getElementsByTagName("precio").item(0).getTextContent());
+				}
+			}
+		}
+
+		if (!existeCliente) {
+			gastoTotal = -1;
+		}
+		return gastoTotal;
+	}
+
+	/**
+	 * Método para actualizar el fichero datos//pedidos.xml con los cambios que se
+	 * hayan podido realizar. Además, formatea el fichero para identar y normalizar
+	 */
 	private void updateFile() {
 
 		TransformerFactory tf = TransformerFactory.newInstance();
