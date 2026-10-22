@@ -259,10 +259,14 @@ public class GestionPedidos {
 			String nif = cliente.getElementsByTagName("nif").item(0).getTextContent();
 			if (nif.equals(nifCliente)) {
 				existeCliente = true;
-				NodeList listaProductos = pedido.getElementsByTagName("productos").item(0).getChildNodes();
+				NodeList listaProductos = pedido.getElementsByTagName("producto");
+				// Este comentado no funciona y no entiendo bien por qué
+//				NodeList listaProductos2 = pedido.getElementsByTagName("productos").item(0).getChildNodes();
 				for (int j = 0; j < listaProductos.getLength(); j++) {
-					//gastoTotal += Double.parseDouble(listaProductos.item(j).getChildNodes().item(2).getTextContent());
-					gastoTotal += Double.parseDouble(((Element)listaProductos.item(j)).getElementsByTagName("precio").item(0).getTextContent());
+					Element producto = (Element) listaProductos.item(j);
+					gastoTotal += Double.parseDouble(producto.getElementsByTagName("precio").item(0).getTextContent());
+					// Este comentado no funciona y no entiendo bien por qué
+//					gastoTotal += Double.parseDouble(listaProductos2.item(j).getChildNodes().item(2).getTextContent());
 				}
 			}
 		}
