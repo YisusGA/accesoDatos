@@ -1,0 +1,24 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>es.dam2</groupId>
+	<artifactId>UD1_FICHEROS_JAXB</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+
+	<!-- API de JAXB -->
+	<dependency>
+		<groupId>jakarta.xml.bind</groupId>
+		<artifactId>jakarta.xml.bind-api</artifactId>
+		<version>4.0.5</version>
+	</dependency>
+
+	<!-- Implementación en tiempo de ejecución (Runtime) -->
+	<dependency>
+		<groupId>com.sun.xml.bind</groupId>
+		<artifactId>jaxb-impl</artifactId>
+		<version>4.0.5</version>
+		<scope>runtime</scope>
+	</dependency>
+
+</project>
