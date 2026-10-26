@@ -6,19 +6,22 @@
 	<artifactId>UD1_FICHEROS_JAXB</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
-	<!-- API de JAXB -->
-	<dependency>
-		<groupId>jakarta.xml.bind</groupId>
-		<artifactId>jakarta.xml.bind-api</artifactId>
-		<version>4.0.5</version>
-	</dependency>
+	<dependencies>
+		<!-- API de JAXB -->
+		<dependency>
+			<groupId>jakarta.xml.bind</groupId>
+			<artifactId>jakarta.xml.bind-api</artifactId>
+			<version>4.0.5</version>
+		</dependency>
 
-	<!-- Implementación en tiempo de ejecución (Runtime) -->
-	<dependency>
-		<groupId>com.sun.xml.bind</groupId>
-		<artifactId>jaxb-impl</artifactId>
-		<version>4.0.5</version>
-		<scope>runtime</scope>
-	</dependency>
+		<!-- Implementación en tiempo de ejecución (Runtime) -->
+		<!-- Source: https://mvnrepository.com/artifact/com.sun.xml.bind/jaxb-impl -->
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-impl</artifactId>
+			<version>4.0.9</version>
+			<scope>runtime</scope>
+		</dependency>
+	</dependencies>
 
 </project>
