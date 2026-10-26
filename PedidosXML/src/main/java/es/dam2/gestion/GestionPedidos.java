@@ -23,6 +23,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -159,7 +160,7 @@ public class GestionPedidos {
 	public void insertarPedido(Pedido pedido) {
 
 		// Obtenemos el nodo pedidos
-		Element pedidosNode = (Element) document.getElementsByTagName("pedidos").item(0);
+		Element pedidosNode = (Element) document.getFirstChild();
 		// Nodo pedido con sus hijos cliente y productos
 		Element pedidoNode = (Element) pedidosNode.appendChild(document.createElement("pedido"));
 		pedidoNode.setAttribute("codigo", pedido.getCodigo());
@@ -240,6 +241,8 @@ public class GestionPedidos {
 		}
 	}
 
+	// Mejor este método que la versión Alt de debajo, es mucho más sencillo!!
+
 	/**
 	 * Método para mostrar los gastos totales de un Cliente
 	 * 
@@ -260,13 +263,80 @@ public class GestionPedidos {
 			if (nif.equals(nifCliente)) {
 				existeCliente = true;
 				NodeList listaProductos = pedido.getElementsByTagName("producto");
-				// Este comentado no funciona y no entiendo bien por qué
-//				NodeList listaProductos2 = pedido.getElementsByTagName("productos").item(0).getChildNodes();
 				for (int j = 0; j < listaProductos.getLength(); j++) {
 					Element producto = (Element) listaProductos.item(j);
-					gastoTotal += Double.parseDouble(producto.getElementsByTagName("precio").item(0).getTextContent());
-					// Este comentado no funciona y no entiendo bien por qué
-//					gastoTotal += Double.parseDouble(listaProductos2.item(j).getChildNodes().item(2).getTextContent());
+					gastoTotal += (Double.parseDouble(producto.getElementsByTagName("precio").item(0).getTextContent())
+							* Integer.parseInt(producto.getElementsByTagName("cantidad").item(0).getTextContent()));
+				}
+			}
+		}
+
+		if (!existeCliente) {
+			gastoTotal = -1;
+		}
+		return gastoTotal;
+	}
+
+	// Este método está guay para entender lo que devuelve el método getChildNodes()
+	// y cómo gestionarlo, pero es mucho más tedioso y complicado
+
+	/**
+	 * Método alternativo para mostrar los gastos totales de un Cliente
+	 * 
+	 * @param nifCliente el nif del Cliente cuyo gasto total se quiere calcular
+	 * @return un double con el gasto total asociado al cliente encontrado, o -1 si
+	 *         no se encontró un Cliente con ese nif
+	 */
+	public double devolverGastosCienteAlt(String nifCliente) {
+		double gastoTotal = 0;
+		boolean existeCliente = false;
+
+		NodeList pedidosNodeList = document.getElementsByTagName("pedido");
+
+		for (int i = pedidosNodeList.getLength() - 1; i >= 0; i--) {
+			Element pedido = (Element) pedidosNodeList.item(i);
+			Element cliente = (Element) pedido.getElementsByTagName("cliente").item(0);
+			String nif = cliente.getElementsByTagName("nif").item(0).getTextContent();
+			if (nif.equals(nifCliente)) {
+				existeCliente = true;
+				// CUIDADO: El método getChildNodes() devuelve todos los nodos hijos de primer
+				// nivel (sólo los descendientes directos, no es recursivo). Pero hay que tener
+				// en cuenta que en esos nodos hijos, no sólo habrá nodos de tipo elemento
+				// (<etiqueta>), sino que también habrá otros tipos de nodo, como los nodos de
+				// tipo texto (como un salto de línea "\n")
+				NodeList listaProductos = pedido.getElementsByTagName("productos").item(0).getChildNodes();
+				for (int j = 0; j < listaProductos.getLength(); j++) {
+					Element producto = null;
+					if (listaProductos.item(j).getNodeType() == Node.ELEMENT_NODE) {
+						producto = (Element) listaProductos.item(j);
+						NodeList atributosProducto = producto.getChildNodes();
+
+						// Variables necesarias para gestionar lo que va a ocurrir dentro del for de
+						// debajo
+						boolean precioEncontrado = false;
+						boolean cantidadEncontrada = false;
+						Element cantidad = null;
+						Element precio = null;
+						for (int k = 0; (!cantidadEncontrada && !precioEncontrado) || k < atributosProducto.getLength(); k++) {
+							Node atributoNode = atributosProducto.item(k);
+							if (atributoNode.getNodeType() == Node.ELEMENT_NODE) {
+								if (atributoNode.getNodeName().equals("cantidad")) {
+									cantidad = (Element) atributoNode;
+									cantidadEncontrada = true;
+								}
+								if (atributoNode.getNodeName().equals("precio")) {
+									precio = (Element) atributoNode;
+									precioEncontrado = true;
+								}
+								// Si y sólo si se han encontrado tanto el precio como la cantidad, los
+								// parseamos y los tenemos en cuenta para actualizar el valor de gastoTotal
+								if (cantidadEncontrada && precioEncontrado) {
+									gastoTotal += (Double.parseDouble(precio.getTextContent())
+											* Double.parseDouble(cantidad.getTextContent()));
+								}
+							}
+						}
+					}
 				}
 			}
 		}

@@ -9,9 +9,14 @@ public class Main {
 		String nifTest = "" + 1;
 		
 		GestionPedidos gestion = new GestionPedidos();
-		gestion.insertarPedido(gestion.crearPedido(gestion.crearListaProductos()));
+		
+		// Descomentar para insertar un pedido
+//		gestion.insertarPedido(gestion.crearPedido(gestion.crearListaProductos()));
+		
 		gestion.mostrarPedidosCliente(nifTest);
-		System.out.printf("El cliente con nif %s ha gastado %.2f", nifTest, gestion.devolverGastosCiente(nifTest));
+
+		System.out.printf("El cliente con nif %s ha gastado %.2f\n", nifTest, gestion.devolverGastosCiente(nifTest));
+		System.out.printf("(Método alternativo) El cliente con nif %s ha gastado %.2f\n", nifTest, gestion.devolverGastosCienteAlt(nifTest));
 	}
 
 }
