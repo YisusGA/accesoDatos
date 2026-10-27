@@ -332,7 +332,7 @@ public class GestionPedidos {
 								// parseamos y los tenemos en cuenta para actualizar el valor de gastoTotal
 								if (cantidadEncontrada && precioEncontrado) {
 									gastoTotal += (Double.parseDouble(precio.getTextContent())
-											* Double.parseDouble(cantidad.getTextContent()));
+											* Integer.parseInt(cantidad.getTextContent()));
 								}
 							}
 						}
