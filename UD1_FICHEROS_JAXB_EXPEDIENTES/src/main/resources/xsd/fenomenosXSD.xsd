@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <!-- Elemento raíz: archivo -->
+    <xs:element name="archivo">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="expediente" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="titulo" type="xs:string"/>
+                            <xs:element name="ubicacion">
+                                <xs:complexType>
+                                    <xs:simpleContent>
+                                        <xs:extension base="xs:string">
+                                            <xs:attribute name="pais" type="xs:string" use="required"/>
+                                        </xs:extension>
+                                    </xs:simpleContent>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="investigaciones">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="investigacion" maxOccurs="unbounded">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element name="responsable" type="xs:string"/>
+                                                    <xs:element name="resultado" type="xs:string"/>
+                                                    <xs:element name="evidencias" minOccurs="0">
+                                                        <xs:complexType>
+                                                            <xs:sequence>
+                                                                <xs:element name="evidencia" maxOccurs="unbounded">
+                                                                    <xs:complexType>
+                                                                        <xs:simpleContent>
+                                                                            <xs:extension base="xs:string">
+                                                                                <xs:attribute name="tipo" type="xs:string" use="required"/>
+                                                                            </xs:extension>
+                                                                        </xs:simpleContent>
+                                                                    </xs:complexType>
+                                                                </xs:element>
+                                                            </xs:sequence>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                                <xs:attribute name="año" type="xs:gYear" use="required"/>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                        <xs:attribute name="codigo" type="xs:string" use="required"/>
+                        <xs:attribute name="estado" use="required">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:enumeration value="abierto"/>
+                                    <xs:enumeration value="cerrado"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:attribute>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute name="nombre" type="xs:string" use="required"/>
+            <xs:attribute name="fundacion" type="xs:gYear" use="required"/>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

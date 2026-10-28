@@ -6,6 +6,50 @@
 	<artifactId>UD1_FICHEROS_JAXB</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.jvnet.jaxb</groupId>
+				<artifactId>jaxb-maven-plugin</artifactId>
+				<version>4.0.16</version>
+				<executions>
+					<execution>
+						<goals>
+							<!-- En las Goals de la Configuration de la Maven
+							Build, debemos poner generate-sources-->
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<!-- Directorio donde guardas tus archivos de esquema .xsd.
+					Debe existir -->
+					<schemaDirectory>${project.basedir}/src/main/resources/xsd</schemaDirectory>
+
+					<!-- Patrón para buscar los archivos de esquema .xsd.
+					Nosotros debemos generar estos archivos .xsd y guardarlos en
+					la ruta que hemos puesto en schemaDirectory -->
+					<schemaIncludes>
+						<include>*.xsd</include>
+					</schemaIncludes>
+
+					<!-- Crear carpeta de salida para el código generado.
+					${project.build.directory} apunta a una carpeta target a
+					nivel de proyecto. Nunca debería ponerse esto apuntando a la carpeta src con el
+					código fuente, pues no es código fuente del proyecto y
+					metería ruido. Estas clases de XJC se generan cada vez que
+					Maven construye el proyecto -->
+					<generateDirectory>
+						${project.build.directory}/generated-sources/xjc
+					</generateDirectory>
+
+					<!-- Paquete de destino para las clases Java generadas-->
+					<generatePackage>es.dam2</generatePackage>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
 	<dependencies>
 		<!-- API de JAXB -->
 		<dependency>
@@ -15,7 +59,8 @@
 		</dependency>
 
 		<!-- Implementación en tiempo de ejecución (Runtime) -->
-		<!-- Source: https://mvnrepository.com/artifact/com.sun.xml.bind/jaxb-impl -->
+		<!-- Source:
+		https://mvnrepository.com/artifact/com.sun.xml.bind/jaxb-impl -->
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-impl</artifactId>
