@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+    <!-- Todo lo que sea ElementoType indica que es un tipo de dato complejo, que generará su propia clase para poder gestionar la complejidad intrínseca que tiene -->
+    
+    <xs:element name="archivo" type="ArchivoType"/>
+
+    <xs:complexType name="ArchivoType">
+        <xs:sequence>
+            <xs:element name="expediente" type="ExpedienteType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="nombre" type="xs:string" use="required"/>
+        <xs:attribute name="fundacion" type="xs:gYear" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="ExpedienteType">
+        <xs:sequence>
+            <xs:element name="titulo" type="xs:string"/>
+            <xs:element name="ubicacion" type="UbicacionType"/>
+            <xs:element name="investigaciones" type="InvestigacionesType"/>
+        </xs:sequence>
+        <xs:attribute name="codigo" type="xs:string" use="required"/>
+        <xs:attribute name="estado" type="EstadoType" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="UbicacionType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="pais" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="InvestigacionesType">
+        <xs:sequence>
+            <xs:element name="investigacion" type="InvestigacionType" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="InvestigacionType">
+        <xs:sequence>
+            <xs:element name="responsable" type="xs:string"/>
+            <xs:element name="resultado" type="xs:string"/>
+            <xs:element name="evidencias" type="EvidenciasType" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="año" type="xs:gYear" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="EvidenciasType">
+        <xs:sequence>
+            <xs:element name="evidencia" type="EvidenciaType" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="EvidenciaType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="tipo" type="TipoEvidenciaType" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:simpleType name="EstadoType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="abierto"/>
+            <xs:enumeration value="cerrado"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="TipoEvidenciaType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="fotografia"/>
+            <xs:enumeration value="audio"/>
+            <xs:enumeration value="video"/>
+            <xs:enumeration value="sensor"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+</xs:schema>
