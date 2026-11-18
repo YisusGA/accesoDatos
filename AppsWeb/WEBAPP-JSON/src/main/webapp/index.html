@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>My App</title>
+</head>
+<body>
+
+	<h2>Sube aquí tu archivo:</h2>
+
+	<!-- 
+	action es la acción que se desencadena. Que en nuestro caso, será un servlet. 
+	Y tendremos que enlazar este action con el servlet que queramos. Los input se
+	encargar de cargar datos en la REQUEST. El method establece cómo se mandar los 
+	datos. Puede ser GET y POST. Si es GET, los datos viajan en el header de la URL y son visibles.
+	Se suele usar para consultar. Pero cuando se mandan muchos datos (como por ejemplo,
+	datos a insertar), es mejor idea usar el method POST, porque los datos van en el cuerpo y no son
+	visibles. Si usamos POST para realizar una inserción, hay que tener en cuenta que no es una acción
+	
+	El enctype este hay que ponerlo para avisar de que no mandamos texto normal, sino un fichero.
+	SI no tuviéramos el input de file, no haría falta.
+	 
+	 -->
+	<form action="upload" method="post" enctype="multipart/form-data">
+		<label for="file">Seleccione un archivo:</label> <br> <input
+			type="file" name="file" id="file"> <br> <br> <input
+			type="submit" value="Subir archivo">
+	</form>
+
+</body>
+</html>
